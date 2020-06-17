@@ -1,0 +1,50 @@
+<h1>Greg Terlecki theScore App Assignment</h1>
+
+
+<%= f = form_for :search_form, "#", phx_submit: "search" %>
+    <%= text_input f, :name %>
+    <%= submit "Refresh", phx_disable_with: "Searching..."%>
+</form>
+
+<div>Page #<%= @data.page_number %></div>
+<div>Page size <%= @data.page_size %></div>
+<div>Total pages <%= @data.total_pages %></div>
+
+<table>
+    <tr>
+        <th>Player</th>
+        <th>Team</th>
+        <th>Position</th>
+        <th>Att/G</th>
+        <th>Att</th>
+        <th>Yds</th>
+        <th>Avg</th>
+        <th>Yds/G</th>
+        <th>TD</th>
+        <th>Lng</th>
+        <th>1st</th>
+        <th>1st%</th>
+        <th>20+</th>
+        <th>40+</th>
+        <th>FUM</th>
+    </tr>
+    <%= for result <- @data.entries do %>
+        <tr>
+            <td> <%= result.player %> </td>
+            <td> <%= result.team %> </td>
+            <td> <%= result.position %> </td>
+            <td> <%= result.rushing_attempts_per_game_average %> </td>
+            <td> <%= result.rushing_attempts %> </td>
+            <td> <%= result.total_rushing_yards %> </td>
+            <td> <%= result.rushing_average_yards_per_attempt %> </td>
+            <td> <%= result.rushing_yards_per_game %> </td>
+            <td> <%= result.total_rushing_touchdowns %> </td>
+            <td> <%= result.longest_rush %> <%= if result.longest_rush_touchdown, do: "T", else: "" %> </td> <!-- Need to merge longest_rush_touchdown -->
+            <td> <%= result.rushing_first_downs %> </td>
+            <td> <%= result.rushing_first_down_percentage %> </td>
+            <td> <%= result.rushing_20_yards_each %> </td>
+            <td> <%= result.rushing_40_yards_each %> </td>
+            <td> <%= result.rushing_fumbles %> </td>
+        </tr>
+    <% end %>
+</table>

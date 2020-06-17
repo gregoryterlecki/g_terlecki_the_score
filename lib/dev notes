@@ -1,0 +1,21 @@
+pagination on live view side
+    On the client side table, you may want to merge the boolean touchdown variable with the integer amount of yards with sorting working
+
+chunk down mode for csv export 
+
+if you have time, cache the most common query on the server side and have requests hit that agent
+also if you have time, implement rate limits for each user and size limits for each page
+
+it could have been better to use a db like casandra for fast reads, or a database that's better for analytics
+
+
+
+Other info:
+elasticsearch is great for flexibility and good read time
+
+
+<form action="#" phx-submit="search">
+  <input value="<%= @name %>" />
+  <%# <button type="submit">Search</button> %>
+  <button action="submit">Search</button> <!-- Visible only when input was changed. When button is clicked,  -->
+</form>
