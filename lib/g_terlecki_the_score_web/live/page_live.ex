@@ -1,7 +1,7 @@
 defmodule GTerleckiTheScoreWeb.PageLive do
   use GTerleckiTheScoreWeb, :live_view
-  alias GTerleckiTheScore.{Repo, Rushing, RushingSearch}
-  import Ecto.Query
+  alias GTerleckiTheScore.RushingSearch
+  # import Ecto.Query
 
   @impl true
   def mount(_params, _session, socket) do
@@ -35,12 +35,7 @@ defmodule GTerleckiTheScoreWeb.PageLive do
     }
   end
 
-  # two ways you could significantly refactor the order by code:
-  # 1: if each phx-click could send some payload, I wouldn't have to have a clause for each column; 
-  #    I could combine them all, assigning the column being ordered as the variable payload
-  # 2: The logic itself is messy for alternating :asc to :desc if the column is already ordered, 
-  #    vs setting the column to :desc if another column is already selected
-  def handle_event("ob_yards", event, socket) do
+  def handle_event("ob_yards", _event, socket) do
     order_by = case socket.assigns.order_by do
       [dir, :total_rushing_yards] -> 
         [
@@ -59,7 +54,7 @@ defmodule GTerleckiTheScoreWeb.PageLive do
     }
   end
 
-  def handle_event("ob_longest_rush", event, socket) do
+  def handle_event("ob_longest_rush", _event, socket) do
     order_by = case socket.assigns.order_by do
       [dir, :longest_rush] -> 
         [ 
@@ -71,18 +66,13 @@ defmodule GTerleckiTheScoreWeb.PageLive do
         ]
       [_dir, _column] -> [:desc, :longest_rush]
     end
+    socket = assign(socket, :order_by, order_by)
     {:noreply, 
       assign(socket, data: RushingSearch.get_records(socket, 0))
     }
   end
 
-  def handle_event("page_size", event, socket) do
-    {:noreply, 
-      assign(socket, data: RushingSearch.get_records(socket, 0))
-    }
-  end
-
-  def handle_event("export", event, socket) do
+  def handle_event("export", _event, socket) do
     %{name: name, data: %{page_number: page_number}} = socket.assigns
     url = "http://localhost:4000/api/export?name="<>name<>"&page_number="<>Integer.to_string(page_number)
     HTTPoison.get(url)

@@ -1,14 +1,66 @@
-pagination on live view side
-    On the client side table, you may want to merge the boolean touchdown variable with the integer amount of yards with sorting working
+Thank you for reviewing my dev notes.
+Here I'll briefly explain what I did, considered, what I couldn't do at the moment, and what I would improve if I had more time.
 
-chunk down mode for csv export 
+For starters, ReactJS is my forte. If I had implemented the frontend in React, I could definitely finish all 
+the 4 main features as per the requirements (in all fairness, I can only say I completed 3 of the 4).
+In this assignment I chose to go with Phoenix LiveVeiw. I wanted to try something new, and show that I can 
+learn new things while still producing working software. 
 
-if you have time, cache the most common query on the server side and have requests hit that agent
-also if you have time, implement rate limits for each user and size limits for each page
+While I was able to complete the rest of the UI fairly easily, the novelty of LiveView meant 
+I was having a hard time with changing the page size, and ordering the columns. 
+I spent a fair amount of time building the rest of the UI with LiveView, which was tricky considering 
+the less than ideal documentation and lack of examples online, since LiveView is so new.
+I must admit that despite this, I'm proud that I was able to build what I did, considering 
+I've never used LiveView before. I see myself using LiveView more in the future. 
 
-it could have been better to use a db like casandra for fast reads, or a database that's better for analytics
+I should point out a curveball I noticed in the json data provided. 
+Some datatypes were not consistent, but more importantly, two different concepts were given in the 
+“longest_rush” column (the length of the rush, and whether or not it was a touchdown, denoted by the letter “T”). 
+This added some complexity to the process of seeding the database, but it also has implications for the user. 
+Some important questions to ask as the developer/designer are:
+Does the user want to see these as separate columns? (rush length and touchdown)
+Should the user be able to see only the touchdown rushes at the top when ordering? How about the longest rushes that were not touchdowns?
+
+I identified this right away, and my goal was to implement a column ordering for this where:
+The user sees just one column (i.e. 65T, 34, etc)
+The user is able to sort by whether a touchdown was made, and by the length of the rush; in either direction.
+
+Unfortunately, I wasn’t able to get to this because of the limited time I had to do everything in LiveView. 
+However, I was able to get the other 3 tasks done.
+I made a table that shows the contents of the json file, I enabled the user to filter by name, and 
+I was able to implement an export csv feature.
+
+The csv export feature is important to get right, because if implemented naively, the server would 
+have to collect all the rows into memory before shipping them off. Assuming the system is undergoing 
+significant load, many users could be affected by even just a few users trying to export CSVs. 
+To combat this issue, I first made sure to query the database in batches, meaning the system doesn’t 
+have to hold all the rows in memory at one time.
+This also means that the client needs to know that the file is coming in batches, and not all at once. 
+By using send_chunked(), the transfer-encoding response header is set as "chunked", which tells the 
+client to keep the http connection open to receive all chunks of the body.
+
+Also note that in page_live.ex, you can see that I was working on the implementation for the column ordering feature. 
+This WIP implementation is flawed, and I had two goals in mind for its refactoring once I got it working:
+
+1. If each phx-click could send some payload, I wouldn't be required to write separate clause for each column. 
+   I could combine them all, assigning the column being ordered as the variable payload (I was spending quite 
+   some time on finding a way to send a string payload with each click of the <th>).
+2. The logic itself is messy for alternating :asc to :desc if the column is already ordered, vs setting 
+   the column to :desc if another column is already selected.
 
 
 
-Other info:
-elasticsearch is great for flexibility and good read time
+Here’s what I would’ve liked to get done to go the extra mile, assuming I had more time.
+
+A system like this could benefit from supporting agent caching. This way, for common requests, 
+the client doesn’t have to wait as long and the load on the system could be reduced. 
+
+I was also considering adding a rate limit, to prevent DDoS attacks.
+
+Near the start of the assignment I was considering using elasticsearch, for its capability to perform quick reads. 
+I had never used it before and I’ve heard good things, but I figured that I would be biting off more than I could 
+chew if I started with elasticsearch off the bat. I was already using LiveViews and I wanted to make sure I could finish the project. 
+
+
+I am happy to discuss anything else about this project in a next interview, should I get one. 
+Thanks for your time and consideration so far with my application, and I hope to hear back. 
