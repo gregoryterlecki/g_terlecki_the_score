@@ -1,14 +1,23 @@
 <h1>Greg Terlecki theScore App Assignment</h1>
 
+<p>Showing results for: <%= @name %></p>
 
 <%= f = form_for :search_form, "#", phx_submit: "search" %>
     <%= text_input f, :name %>
     <%= submit "Refresh", phx_disable_with: "Searching..."%>
 </form>
 
+<button phx-click="dec">-</button>
+
 <div>Page #<%= @data.page_number %></div>
+
+<button phx-click="inc">+</button>
+
 <div>Page size <%= @data.page_size %></div>
+
 <div>Total pages <%= @data.total_pages %></div>
+
+<button phx-click="export">Export</button>
 
 <table>
     <tr>
@@ -17,7 +26,7 @@
         <th>Position</th>
         <th>Att/G</th>
         <th>Att</th>
-        <th>Yds</th>
+        <th phx-click="order_by_yds">Yds</th>
         <th>Avg</th>
         <th>Yds/G</th>
         <th>TD</th>

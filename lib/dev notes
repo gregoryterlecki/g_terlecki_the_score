@@ -12,10 +12,3 @@ it could have been better to use a db like casandra for fast reads, or a databas
 
 Other info:
 elasticsearch is great for flexibility and good read time
-
-
-<form action="#" phx-submit="search">
-  <input value="<%= @name %>" />
-  <%# <button type="submit">Search</button> %>
-  <button action="submit">Search</button> <!-- Visible only when input was changed. When button is clicked,  -->
-</form>
