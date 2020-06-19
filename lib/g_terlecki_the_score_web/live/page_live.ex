@@ -9,30 +9,29 @@ defmodule GTerleckiTheScoreWeb.PageLive do
       socket
       |> assign(:name, "")
       |> assign(page_size: 10)
-      |> assign(:data, get_records("", 1, 10))
+      |> assign(:data, RushingSearch.get_records("", 1, 10))
     }
   end
 
   @impl true
   def handle_event("search", %{"search_form" => %{"name" => name}}, socket) do
     # find a way to preserve the name input after clicking refresh
-    IO.inspect(name, label: "name")
+    socket = assign(socket, name: name)
     {:noreply, 
       socket
-      |> assign(name: name)
-      |> assign(data: get_records(get_name(socket), get_page_number(socket), get_page_size(socket)))
+      |> assign(data: RushingSearch.get_records(socket, 0))
     }
   end
 
   def handle_event("dec", _event, socket) do
     {:noreply,
-      assign(socket, data: get_records(get_name(socket), get_page_number(socket)-1, get_page_size(socket)))
+      assign(socket, data: RushingSearch.get_records(socket, -1))
     }
   end
 
   def handle_event("inc", _event, socket) do
     {:noreply, 
-      assign(socket, data: get_records(get_name(socket), get_page_number(socket)+1, get_page_size(socket)))
+      assign(socket, data: RushingSearch.get_records(socket, 1))
     }
   end
 
@@ -40,29 +39,24 @@ defmodule GTerleckiTheScoreWeb.PageLive do
   # {:yds, :desc}
   def handle_event("order_by_yds", event, socket) do
     {:noreply, 
-      assign(socket, data: get_records(get_name(socket), get_page_number(socket)+1, get_page_size(socket)))
+      assign(socket, data: RushingSearch.get_records(socket, 0))
     }
   end
 
-  @impl true
   def handle_event("page_size", event, socket) do
     {:noreply, 
-      assign(socket, data: get_records(get_name(socket), get_page_number(socket), get_page_size(socket)))
+      assign(socket, data: RushingSearch.get_records(socket, 0))
     }
   end
 
-  @impl true
-  def handle_event("ob_yds", event, socket) do 
-    
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("export", event, socket) do
-    %{name: name, data: %{entries: entries, page_size: page_size}} = get_state(socket)
-    # IO.inspect(name, label: "name")
-    # IO.inspect(entries, label: "entries")
-    # IO.inspect(page_size, label: "page_size")
+    # get params, arrange them into a query string
+    # use httpoison to send a request to a route
+    # define this route, make controller to handle the request
+    # in this controller, use your RushingSearch module to handle the export
+    %{name: name, data: %{page_number: page_number}} = socket.assigns
+    url = "http://localhost:4000/api/export?name="<>name<>"&page_number="<>Integer.to_string(page_number)
+    HTTPoison.get(url)
     {:noreply, socket}
   end
 
@@ -72,19 +66,6 @@ defmodule GTerleckiTheScoreWeb.PageLive do
     Rushing
     |> where([r], ilike(r.player, ^"%#{name}%"))
     |> Repo.paginate(page: page_number, page_size: page_size)
-  end
-
-  # refactor to use pattern matching on these field
-  defp get_name(socket) do
-    socket.assigns.name
-  end
-
-  defp get_page_number(socket) do
-    socket.assigns.data.page_number
-  end
-
-  defp get_page_size(socket) do
-    socket.assigns.data.page_size
   end
 
   defp get_state(socket) do

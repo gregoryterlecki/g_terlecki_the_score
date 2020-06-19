@@ -21,9 +21,10 @@ defmodule GTerleckiTheScoreWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", GTerleckiTheScoreWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", GTerleckiTheScoreWeb do
+    pipe_through :api
+    get "/export", ExportController, :index
+  end
 
   # Enables LiveDashboard only for development
   #

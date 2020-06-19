@@ -17,7 +17,7 @@
 
 <div>Total pages <%= @data.total_pages %></div>
 
-<button phx-click="export">Export</button>
+<a href="http://localhost:4000/api/export?name=<%= @name %>&page=<%= @data.page_number %>&page_size=<%= @data.page_size%>">EXPORT SELECTION</a>
 
 <table>
     <tr>
@@ -26,7 +26,7 @@
         <th>Position</th>
         <th>Att/G</th>
         <th>Att</th>
-        <th phx-click="order_by_yds">Yds</th>
+        <th>Yds</th>
         <th>Avg</th>
         <th>Yds/G</th>
         <th>TD</th>
