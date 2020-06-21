@@ -7,7 +7,7 @@ defmodule GTerleckiTheScoreWeb.PageLive do
   def mount(_params, _session, socket) do
     {:ok, 
       socket
-      |> assign(:order_by, [nil, nil])
+      |> assign(:order_by, {:desc, :total_rushing_yards})
       |> assign(:name, "")
       |> assign(page_size: 10)
       |> assign(:data, RushingSearch.get_records("", 1, 10))
@@ -35,40 +35,15 @@ defmodule GTerleckiTheScoreWeb.PageLive do
     }
   end
 
-  def handle_event("ob_yards", _event, socket) do
+  def handle_event("order_by", %{"id" => col}, socket) do
+    col_atom = String.to_atom(col)
     order_by = case socket.assigns.order_by do
-      [dir, :total_rushing_yards] -> 
-        [
-          case dir do
-            :desc -> :asc
-            _ -> :desc
-          end,
-          :total_rushing_yards
-        ]
-
-      [_dir, _column] -> [:desc, :total_rushing_yards]
+      {:desc, _} -> {:asc, col_atom}
+      {:asc, _} -> {:desc, col_atom}
+      {nil, nil} -> {:desc, col_atom}
     end
-    socket = assign(socket, :order_by, order_by)
     {:noreply, 
-      assign(socket, data: RushingSearch.get_records(socket, 0))
-    }
-  end
-
-  def handle_event("ob_longest_rush", _event, socket) do
-    order_by = case socket.assigns.order_by do
-      [dir, :longest_rush] -> 
-        [ 
-          case dir do
-            :desc -> :asc
-            _ -> :desc
-          end,
-          :longest_rush
-        ]
-      [_dir, _column] -> [:desc, :longest_rush]
-    end
-    socket = assign(socket, :order_by, order_by)
-    {:noreply, 
-      assign(socket, data: RushingSearch.get_records(socket, 0))
+      assign(socket, order_by: order_by, data: RushingSearch.get_records(socket, 0))
     }
   end
 
@@ -80,5 +55,3 @@ defmodule GTerleckiTheScoreWeb.PageLive do
   end
 
 end
-
-
