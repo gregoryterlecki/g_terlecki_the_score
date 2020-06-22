@@ -2,7 +2,7 @@ Thank you for reviewing my dev notes.
 Here I'll briefly explain what I did, considered, what I couldn't do at the moment, and what I would improve if I had more time.
 
 For starters, ReactJS is my forte. If I had implemented the frontend in React, I could definitely finish all 
-the 4 main features as per the requirements (in all fairness, I can only say I completed 3 of the 4).
+the 4 main features with enough time to spare to refactor code, and enhance the user experience.
 In this assignment I chose to go with Phoenix LiveVeiw. I wanted to try something new, and show that I can 
 learn new things while still producing working software. 
 
@@ -15,7 +15,7 @@ I've never used LiveView before. I see myself using LiveView more in the future.
 
 I should point out a curveball I noticed in the json data provided. 
 Some datatypes were not consistent, but more importantly, two different concepts were given in the 
-“longest_rush” column (the length of the rush, and whether or not it was a touchdown, denoted by the letter “T”). 
+"longest_rush" column (the length of the rush, and whether or not it was a touchdown, denoted by the letter "T"). 
 This added some complexity to the process of seeding the database, but it also has implications for the user. 
 Some important questions to ask as the developer/designer are:
 Does the user want to see these as separate columns? (rush length and touchdown)
@@ -26,9 +26,14 @@ The user sees just one column (i.e. 65T, 34, etc)
 The user is able to sort by whether a touchdown was made, and by the length of the rush; in either direction.
 
 Unfortunately, I wasn’t able to get to this because of the limited time I had to do everything in LiveView. 
-However, I was able to get the other 3 tasks done.
-I made a table that shows the contents of the json file, I enabled the user to filter by name, and 
-I was able to implement an export csv feature.
+However, I was able to implement column ordering for the columns referenced in the assignment description.
+I made a table that shows the contents of the json file, I enabled the user to filter by name, sort columns and 
+I was able to implement an export csv feature. Please note that to use the column ordering feature, click the 
+header of the column on the table to sort it. It's not immediately obvious from the UI that this can be done
+(which is one of the improvements I would definitely make). I should point out that the column ordering feature
+doesn't necessarily work perfectly. It seems that the first click given to a column doesn't sort the column, but every other click
+afterwards sorts the data as expected. I would never attempt to submit code that works "most of the time" in a professional setting.
+However, for the purposes of this interview, I believed it was important for me to show my approach to the problem.
 
 The csv export feature is important to get right, because if implemented naively, the server would 
 have to collect all the rows into memory before shipping them off. Assuming the system is undergoing 
@@ -38,19 +43,11 @@ have to hold all the rows in memory at one time.
 This also means that the client needs to know that the file is coming in batches, and not all at once. 
 By using send_chunked(), the transfer-encoding response header is set as "chunked", which tells the 
 client to keep the http connection open to receive all chunks of the body.
-
-Also note that in page_live.ex, you can see that I was working on the implementation for the column ordering feature. 
-This WIP implementation is flawed, and I had two goals in mind for its refactoring once I got it working:
-
-1. If each phx-click could send some payload, I wouldn't be required to write separate clause for each column. 
-   I could combine them all, assigning the column being ordered as the variable payload (I was spending quite 
-   some time on finding a way to send a string payload with each click of the <th>).
-2. The logic itself is messy for alternating :asc to :desc if the column is already ordered, vs setting 
-   the column to :desc if another column is already selected.
+If I had more time, I would add the ability to export the whole file, rather than paged bits of it.
 
 
 
-Here’s what I would’ve liked to get done to go the extra mile, assuming I had more time.
+Here are some more things I would’ve liked to get done if I had more time.
 
 A system like this could benefit from supporting agent caching. This way, for common requests, 
 the client doesn’t have to wait as long and the load on the system could be reduced. 
@@ -62,5 +59,7 @@ I had never used it before and I’ve heard good things, but I figured that I wo
 chew if I started with elasticsearch off the bat. I was already using LiveViews and I wanted to make sure I could finish the project. 
 
 
-I am happy to discuss anything else about this project in a next interview, should I get one. 
-Thanks for your time and consideration so far with my application, and I hope to hear back. 
+I am happy to discuss anything else about this project in a next interview should I get one, since I feel there's a lot more I 
+can say about my code that I didn't already state here. 
+
+Thanks for your time and consideration so far with my application, and I hope to hear back! 

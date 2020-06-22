@@ -1,16 +1,3 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     GTerleckiTheScore.Repo.insert!(%GTerleckiTheScore.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
-# priv/repo/seeds.exs
-
 alias GTerleckiTheScore.{Repo, Rushing}
 
 parse_total_rushing_yards = fn

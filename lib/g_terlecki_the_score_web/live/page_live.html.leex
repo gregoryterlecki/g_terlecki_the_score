@@ -7,6 +7,8 @@
     <%= submit "Refresh", phx_disable_with: "Searching..."%>
 </form>
 
+<p>Ordering: <%= elem(@order_by, 1) %>, <%= elem(@order_by, 0) %></p>
+
 <button phx-click="dec">-</button>
 
 <div>Page #<%= @data.page_number %></div>
@@ -28,8 +30,7 @@
         <th>Avg</th>
         <th>Yds/G</th>
         <th phx-click="order_by" phx-value-id="total_rushing_touchdowns">TD</th>
-        <%# <th phx-click="ob_longest_rush">Lng</th> %>
-        <th>Lng</th>
+        <th phx-click="order_by" phx-value-id="longest_rush">Lng</th>
         <th>1st</th>
         <th>1st%</th>
         <th>20+</th>

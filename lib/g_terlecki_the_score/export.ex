@@ -31,9 +31,7 @@ defmodule GTerleckiTheScore.Export do
         %{query: query} = QueryBuilder.produce_query(params)
         {query, params} = Ecto.Adapters.SQL.to_sql(:all, Repo, query)
         params = Enum.map(params, fn param -> if is_integer(param), do: Integer.to_string(param), else: "'#{param}'" end)
-        IO.inspect(params)
         query_string = produce_query_string(query, params)
-        IO.inspect(query_string)
         full_query_string = "COPY (#{query_string}) to STDOUT WITH CSV DELIMITER ',';"
 
         csv_header = [Enum.join(columns_csv, ","), "\n"]
