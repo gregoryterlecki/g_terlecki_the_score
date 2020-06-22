@@ -1,48 +1,34 @@
-defmodule GTerleckiTheScore.RushingSearch do
+defmodule GTerleckiTheScore.QueryBuilder do
     alias GTerleckiTheScore.{Repo, Rushing}
     import Ecto.Query
 
-    def get_records(name, page_number, page_size) do
-        Rushing
-        |> where([r], ilike(r.player, ^"%#{name}%"))
-        |> Repo.paginate(page: page_number, page_size: page_size)
+    def produce_query(params) do
+        produce_query(params, 0)
     end
 
-
-    def get_records(state, incr) do
-        %{
+    def produce_query(%{
             name: name, 
             order_by: order_by,
-            data: %{
-                page_size: page_size, 
-                page_number: page_number
-            }
-        } = state.assigns
+            page_size: page_size,
+            data: %{page_number: page_number}
+        } = _params, incr) do
+
         total_records = Repo.aggregate(Rushing, :count)
-        offset = (page_number - 1) * page_size
         page_number = process_page_number(page_number, page_size, total_records, incr)
+        offset = (page_number - 1) * page_size
+
         query = from r in Rushing,
             where: ilike(r.player, ^"%#{name}%"),
             order_by: ^order_by,
             offset: ^offset,
             limit: ^page_size
         
-        val = Ecto.Adapters.SQL.to_sql(:all, Repo, query)
-        
-        # {query, params} = Ecto.Adapters.SQL.to_sql(:all, Repo, query)
-        # IO.puts('#{query}, #{params}')
-        IO.inspect('#{elem(val, 0)}')
         %{
-            entries: Repo.all(query), 
-            page_number: page_number, 
-            page_size: page_size
+            query: query,
+            total_records: total_records,
+            page_number: page_number
         }
-    end
-
-    defp produce_query_string(query, params) do
-        Enum.reduce(params, query, fn param, query_string -> 
-            Regex.replace(~r/\$\d+/, query_string, param, global: false)
-        end)
+        
     end
 
     def process_page_number(page_number, page_size, total_records, incr) do
@@ -66,5 +52,4 @@ defmodule GTerleckiTheScore.RushingSearch do
         range = Range.new(1, max_pages)
         Enum.member?(range, page_number)
     end
-
 end

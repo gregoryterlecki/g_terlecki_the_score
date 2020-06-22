@@ -1,6 +1,6 @@
 defmodule GTerleckiTheScore.Export do
     use GTerleckiTheScoreWeb, :controller
-    alias GTerleckiTheScore.Repo
+    alias GTerleckiTheScore.{Repo, QueryBuilder}
 
     def handle_export(conn, params) do
         conn =
@@ -11,7 +11,7 @@ defmodule GTerleckiTheScore.Export do
 
         {:ok, conn} =
             Repo.transaction(fn ->
-                build_query(params)
+                get_query(params)
                 |> Enum.reduce_while(conn, fn (data, conn) ->
                     case chunk(conn, data) do
                         {:ok, conn} ->
@@ -24,38 +24,44 @@ defmodule GTerleckiTheScore.Export do
         conn
     end
 
-    defp build_query(%{
-            "name" => name, 
-            "page" => page_number, 
-            "page_size" => page_size,
-            "dir" => dir,
-            "col" => col
-        } = _params) do
-        IO.inspect({dir, col}, label: "order_by")
+    defp get_query(params) do
+        params = map_params(params)
         columns_csv = ~w(Player Team Pos Att/G Att Yds Avg Tds/G TD Lng 1st 1st% 20+ 40+ FUM)
-        columns = ~w(player team position rushing_attempts_per_game_average rushing_attempts total_rushing_yards rushing_average_yards_per_attempt rushing_yards_per_game total_rushing_touchdowns longest_rush longest_rush_touchdown rushing_first_downs rushing_first_down_percentage rushing_20_yards_each rushing_40_yards_each rushing_fumbles)
-        page_number = String.to_integer(page_number)
-        page_size = String.to_integer(page_size)
 
-        offset = (page_number - 1) * page_size |> Integer.to_string()
-        limit = Integer.to_string(page_size)
-
-        query = """
-            COPY (
-            SELECT #{Enum.join(columns, ",")}
-            FROM rushing
-            WHERE player ILIKE '%#{name}%'
-            ORDER BY #{col} #{dir}
-            OFFSET #{offset}
-            LIMIT #{limit}
-            ) to STDOUT WITH CSV DELIMITER ',';
-        """
+        %{query: query} = QueryBuilder.produce_query(params)
+        {query, params} = Ecto.Adapters.SQL.to_sql(:all, Repo, query)
+        params = Enum.map(params, fn param -> if is_integer(param), do: Integer.to_string(param), else: "'#{param}'" end)
+        IO.inspect(params)
+        query_string = produce_query_string(query, params)
+        IO.inspect(query_string)
+        full_query_string = "COPY (#{query_string}) to STDOUT WITH CSV DELIMITER ',';"
 
         csv_header = [Enum.join(columns_csv, ","), "\n"]
 
-        Ecto.Adapters.SQL.stream(Repo, query, [], max_rows: 500)
+        Ecto.Adapters.SQL.stream(Repo, full_query_string, [], max_rows: 500)
         |> Stream.map(&(&1.rows))
         |> (fn stream -> Stream.concat(csv_header, stream) end).()
+    end
+
+    defp produce_query_string(query, params) do
+        Enum.reduce(params, query, fn param, query_string -> 
+            Regex.replace(~r/\$\d+/, query_string, param, global: false)
+        end)
+    end
+
+    defp map_params(%{
+        "name" => name, 
+        "page" => page_number, 
+        "page_size" => page_size,
+        "dir" => dir,
+        "col" => col
+    } = _params) do 
+        %{
+            name: name,
+            order_by: {String.to_atom(dir), String.to_atom(col)},
+            page_size: String.to_integer(page_size),
+            data: %{page_number: String.to_integer(page_number)}
+        }
     end
 
 end

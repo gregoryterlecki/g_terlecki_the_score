@@ -13,11 +13,9 @@
 
 <button phx-click="inc">+</button>
 
-<div>Page size <%= @data.page_size %></div>
+<div>Page size <%= @page_size %></div>
 
-<div>Total pages <%= @data.total_pages %></div>
-
-<a href="http://localhost:4000/api/export?name=<%= @name %>&page=<%= @data.page_number %>&page_size=<%= @data.page_size%>&dir=<%= elem(@order_by, 0) %>&col=<%= elem(@order_by, 1) %>">EXPORT SELECTION</a>
+<a href="http://localhost:4000/api/export?name=<%= @name %>&page=<%= @data.page_number %>&page_size=<%= @page_size%>&dir=<%= elem(@order_by, 0) %>&col=<%= elem(@order_by, 1) %>">EXPORT SELECTION</a>
 
 <table>
     <tr>
