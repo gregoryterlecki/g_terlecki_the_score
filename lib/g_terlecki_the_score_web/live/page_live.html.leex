@@ -22,14 +22,14 @@
 <table>
     <tr>
         <th>Team</th>
+        <th>Longest Rush</th>
         <th phx-click="order_by" phx-value-id="total_rushing_yards">Yds</th>
-        <th>Lng</th>
     </tr>
     <%= for result <- @data.entries do %>
         <tr>
             <td> <%= result.team %> </td>
+            <th> <%= result.longest_rush %> <%= if result.longest_rush_touchdown, do: "T", else: "" %> </th>
             <td> <%= result.total_rushing_yards %> </td> <!-- for entire team, total this -->
-            <td> <%= result.longest_rush %>
         </tr>
     <% end %>
 </table>

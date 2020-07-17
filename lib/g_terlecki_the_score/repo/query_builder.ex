@@ -44,8 +44,7 @@ defmodule GTerleckiTheScore.QueryBuilder do
                     longest_rush: max(s.longest_rush)
                 }
             ),
-            on: [team: r.team],
-            on: [longest_rush: r.longest_rush],
+            on: [team: r.team, longest_rush: r.longest_rush],
             select: %{
                 team: r.team, 
                 longest_rush: r.longest_rush,
