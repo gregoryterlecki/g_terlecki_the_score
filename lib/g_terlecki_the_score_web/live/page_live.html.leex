@@ -21,39 +21,15 @@
 
 <table>
     <tr>
-        <th>Player</th>
         <th>Team</th>
-        <th>Position</th>
-        <th>Att/G</th>
-        <th>Att</th>
         <th phx-click="order_by" phx-value-id="total_rushing_yards">Yds</th>
-        <th>Avg</th>
-        <th>Yds/G</th>
-        <th phx-click="order_by" phx-value-id="total_rushing_touchdowns">TD</th>
-        <th phx-click="order_by" phx-value-id="longest_rush">Lng</th>
-        <th>1st</th>
-        <th>1st%</th>
-        <th>20+</th>
-        <th>40+</th>
-        <th>FUM</th>
+        <th>Lng</th>
     </tr>
     <%= for result <- @data.entries do %>
         <tr>
-            <td> <%= result.player %> </td>
             <td> <%= result.team %> </td>
-            <td> <%= result.position %> </td>
-            <td> <%= result.rushing_attempts_per_game_average %> </td>
-            <td> <%= result.rushing_attempts %> </td>
-            <td> <%= result.total_rushing_yards %> </td>
-            <td> <%= result.rushing_average_yards_per_attempt %> </td>
-            <td> <%= result.rushing_yards_per_game %> </td>
-            <td> <%= result.total_rushing_touchdowns %> </td>
-            <td> <%= result.longest_rush %> <%= if result.longest_rush_touchdown, do: "T", else: "" %> </td> <!-- Need to merge longest_rush_touchdown -->
-            <td> <%= result.rushing_first_downs %> </td>
-            <td> <%= result.rushing_first_down_percentage %> </td>
-            <td> <%= result.rushing_20_yards_each %> </td>
-            <td> <%= result.rushing_40_yards_each %> </td>
-            <td> <%= result.rushing_fumbles %> </td>
+            <td> <%= result.total_rushing_yards %> </td> <!-- for entire team, total this -->
+            <td> <%= result.longest_rush %>
         </tr>
     <% end %>
 </table>

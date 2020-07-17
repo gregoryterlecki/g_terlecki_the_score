@@ -12,6 +12,7 @@ defmodule GTerleckiTheScore.RushingRepo do
         } = QueryBuilder.produce_query(state.assigns, incr)
 
         entries = Repo.all(query) # consider putting this, and the total entries thing into a Multi
+        IO.inspect(entries)
         %{
             entries: entries,
             page_number: page_number

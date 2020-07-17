@@ -17,11 +17,42 @@ defmodule GTerleckiTheScore.QueryBuilder do
         page_number = process_page_number(page_number, page_size, total_records, incr)
         offset = (page_number - 1) * page_size
 
-        query = from r in Rushing,
-            where: ilike(r.player, ^"%#{name}%"),
-            order_by: ^order_by,
-            offset: ^offset,
-            limit: ^page_size
+        # SELECT
+        # r.team,
+        # r.longest_rush,
+        # r.longest_rush_touchdown,
+        # SUM(r.total_rushing_yards),
+        # max.team,
+        # max.longest_rush
+        # FROM rushing r
+        # JOIN (SELECT team, MAX(longest_rush) AS longest_rush FROM rushing GROUP BY team ORDER BY team) max
+        #     ON r.longest_rush = max.longest_rush AND r.team = max.team
+        # GROUP BY r.team, r.longest_rush, max.team, max.longest_rush, r.longest_rush_touchdown;
+
+        # query = from(r in Rushing,
+        #     group_by
+        # )
+
+        query = from(r in Rushing, 
+            group_by: [:team, :longest_rush, :longest_rush_touchdown],
+            join: subquery(
+                from s in Rushing,
+                group_by: :team,
+                order_by: :team,
+                select: %{
+                    team: s.team,
+                    longest_rush: max(s.longest_rush)
+                }
+            ),
+            on: [team: r.team],
+            on: [longest_rush: r.longest_rush],
+            select: %{
+                team: r.team, 
+                longest_rush: r.longest_rush,
+                longest_rush_touchdown: r.longest_rush_touchdown,
+                total_rushing_yards: sum(r.total_rushing_yards)
+            }
+        )
         
         %{
             query: query,
